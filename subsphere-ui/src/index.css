@@ -1,0 +1,58 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  /* The deep premium obsidian/purple base */
+  --bg-base: #05030a;
+  --grid-color: rgba(255, 255, 255, 0.03);
+}
+
+body {
+  margin: 0;
+  background-color: var(--bg-base);
+  color: #ffffff;
+  font-family: 'Inter', sans-serif;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* The High-Tech Grid Overlay */
+.tech-grid {
+  position: absolute;
+  inset: 0;
+  background-size: 50px 50px;
+  background-image:
+    linear-gradient(to right, var(--grid-color) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--grid-color) 1px, transparent 1px);
+  mask-image: radial-gradient(ellipse at center, black 10%, transparent 80%);
+  -webkit-mask-image: radial-gradient(ellipse at center, black 10%, transparent 80%);
+  z-index: 1;
+  pointer-events: none;
+}
+
+/* Massive Aurora Glows */
+.aurora-glow {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(140px);
+  opacity: 0.5;
+  z-index: 0;
+  pointer-events: none;
+}
+
+/* Text Gradients */
+.hero-text-glow {
+  background: linear-gradient(180deg, #ffffff 0%, #c084fc 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* Glassmorphism for Navbar */
+.glass-nav {
+  background: rgba(5, 3, 10, 0.4);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
