@@ -40,8 +40,8 @@
 		</dependency>
 
 		<dependency>
-			<groupId>com.mysql</groupId>
-			<artifactId>mysql-connector-j</artifactId>
+			<groupId>org.postgresql</groupId>
+			<artifactId>postgresql</artifactId>
 			<scope>runtime</scope>
 		</dependency>
 		<dependency>
@@ -101,7 +101,7 @@
 		<!-- JWT for Stateless Auth -->
 		<dependency>
 			<groupId>io.jsonwebtoken</groupId>
-			<artifactId>jjwt-api</artifactId>
+			<artifactId>jwt-api</artifactId>
 			<version>0.12.3</version>
 		</dependency>
 		<dependency>
