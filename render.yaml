@@ -1,12 +1,24 @@
 services:
   - type: web
     name: subsphere
-    runtime: image
+    env: docker
     repo: https://github.com/Krishna-110/Subsphere
     branch: main
     plan: free
     region: singapore
     dockerfilePath: ./Dockerfile
+    autoDeploy: yes
     envVars:
+      - key: DATABASE_URL
+        value: $SUBSPHORE_DATABASE_URL
+      - key: DATABASE_USERNAME
+        value: $SUBSPHORE_DATABASE_USERNAME
+      - key: DATABASE_PASSWORD
+        value: $SUBSPHORE_DATABASE_PASSWORD
       - key: SPRING_PROFILES_ACTIVE
         value: prod
+
+  - type: postgresql
+    name: subsphere-db
+    plan: free
+    region: singapore
