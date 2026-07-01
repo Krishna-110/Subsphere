@@ -2,15 +2,16 @@ package com.tech.subsphere.payment;
 
 import com.tech.subsphere.subscription.PlanRepository;
 import com.tech.subsphere.subscription.SubscriptionPlan;
-import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.ResponseEntity;
 
 import java.io.IOException;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/payment")
@@ -21,19 +22,29 @@ public class PaymentController {
     private final PlanRepository planRepository; // We need this to find the PRO plan's Stripe ID
 
     @GetMapping("/checkout")
-    public void createCheckout(@AuthenticationPrincipal OAuth2User principal, HttpServletResponse response) throws IOException {
+    public ResponseEntity<Map<String, String>> createCheckout(@AuthenticationPrincipal Object principal) {
+        String email;
+        if (principal instanceof OAuth2User oauth2User) {
+            email = oauth2User.getAttribute("email");
+        } else if (principal instanceof String s) {
+            email = s;
+        } else {
+            return ResponseEntity.status(401).body(Map.of("error", "Authentication failed."));
+        }
 
-        // 1. Get the currently logged-in user's email
-        String email = principal.getAttribute("email");
+        try {
+            // 2. Fetch the PRO plan details from our database
+            SubscriptionPlan proPlan = planRepository.findByName("PRO")
+                    .orElseThrow(() -> new RuntimeException("PRO plan not found in database!"));
 
-        // 2. Fetch the PRO plan details from our database
-        SubscriptionPlan proPlan = planRepository.findByName("PRO")
-                .orElseThrow(() -> new RuntimeException("PRO plan not found in database!"));
+            // 3. Ask the Cashier (StripeService) to generate the bill URL
+            String checkoutUrl = stripeService.createCheckoutSession(email, proPlan.getStripePriceId());
 
-        // 3. Ask the Cashier (StripeService) to generate the bill URL
-        String checkoutUrl = stripeService.createCheckoutSession(email, proPlan.getStripePriceId());
-
-        // 4. FORCED REDIRECT: Immediately send the user's browser to the Stripe page!
-        response.sendRedirect(checkoutUrl);
+            // 4. Safely hand the URL back to React Native
+            return ResponseEntity.ok(Map.of("url", checkoutUrl));
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(500).body(Map.of("error", "Failed to construct billing terminal."));
+        }
     }
 }

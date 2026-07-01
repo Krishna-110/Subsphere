@@ -25,11 +25,16 @@ public class UserController {
     }
 
     @GetMapping("/api/users/me")
-    public ResponseEntity<?> getCurrentUser(@AuthenticationPrincipal OAuth2User principal) {
-        if (principal == null) {
+    public ResponseEntity<?> getCurrentUser(@AuthenticationPrincipal Object principal) {
+        String email;
+        if (principal instanceof OAuth2User oauth2User) {
+            email = oauth2User.getAttribute("email");
+        } else if (principal instanceof String s) {
+            email = s;
+        } else {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Not authenticated");
         }
-        String email = principal.getAttribute("email");
+
         User user = userService.getUserByEmail(email);
         return ResponseEntity.ok(user);
     }

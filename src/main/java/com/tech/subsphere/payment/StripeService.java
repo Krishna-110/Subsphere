@@ -14,6 +14,9 @@ public class StripeService {
     @Value("${stripe.api.key}")
     private String stripeApiKey;
 
+    @Value("${app.frontend.redirect-url}")
+    private String redirectUrl;
+
     // @PostConstruct means "Run this tiny setup method right after Spring creates this class"
     @PostConstruct
     public void init() {
@@ -33,10 +36,10 @@ public class StripeService {
                     .setCustomerEmail(customerEmail)
 
                     // 3. Where should Stripe send them if payment is SUCCESSFUL?
-                    .setSuccessUrl("http://localhost:5173/dashboard?payment=success")
+                    .setSuccessUrl(redirectUrl + "?payment=success")
 
                     // 4. Where should Stripe send them if they click "BACK" or CANCEL?
-                    .setCancelUrl("http://localhost:5173/dashboard?payment=cancelled")
+                    .setCancelUrl(redirectUrl + "?payment=cancelled")
 
                     // 5. What are they buying? (The line item on the bill)
                     .addLineItem(

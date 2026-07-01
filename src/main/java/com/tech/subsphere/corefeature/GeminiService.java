@@ -24,11 +24,14 @@ public class GeminiService {
         // 1. The Google API URL
         String url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=" + apiKey;
         // 2. The Secret Prompt (This is the secret sauce of your SaaS)
-        String prompt = "Act as an expert technical interviewer at a top tech company. " +
-                "I am applying for a job with this description: " + jobDescription + "\n\n" +
-                "Here is my current resume: " + resume + "\n\n" +
-                "Please give me a harsh, realistic critique of how my resume matches the job description, " +
-                "and provide 5 highly technical interview questions I should prepare for.";
+        String prompt = "Act as a brutal but expert technical recruiter at a top-tier tech firm. " +
+                "Analyze this Resume against this Job Description and provide a 'Roast' that is divided into exactly three sections: \n" +
+                "1. **THE GOOD**: What parts of the resume actually match the JD? (Be brief) \n" +
+                "2. **THE BAD**: Where is the candidate lacking or where is the resume weak? (Be honest) \n" +
+                "3. **THE UGLY**: Why would you throw this resume in the trash? (Be brutal but constructive) \n\n" +
+                "IMPORTANT: You MUST use the exact headers '1. **THE GOOD**:', '2. **THE BAD**:', and '3. **THE UGLY**:' for your sections.\n\n" +
+                "Job Description: " + jobDescription + "\n\n" +
+                "Resume: " + resume;
 
         // 3. Building the complex JSON payload that Google expects
         Map<String, Object> requestBody = new HashMap<>();

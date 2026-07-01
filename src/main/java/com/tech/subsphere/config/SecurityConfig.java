@@ -16,7 +16,8 @@ import java.util.Arrays;
 public class SecurityConfig {
 
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http, OAuth2LoginSuccessHandler oAuth2LoginSuccessHandler) throws Exception {
+    public SecurityFilterChain filterChain(HttpSecurity http, OAuth2LoginSuccessHandler oAuth2LoginSuccessHandler,
+            JwtAuthenticationFilter jwtAuthFilter) throws Exception {
         http
                 // 1. Enable CORS using the bean we created below
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
@@ -24,24 +25,26 @@ public class SecurityConfig {
                 // 2. Disable CSRF so React can send POST requests to our AI endpoint
                 .csrf(csrf -> csrf.disable())
 
+                // 3. Make App Stateless (NO SESSIONS)
+                .sessionManagement(session -> session.sessionCreationPolicy(
+                        org.springframework.security.config.http.SessionCreationPolicy.STATELESS))
+
                 .authorizeHttpRequests(auth -> auth
                         // Secure your AI generation endpoint
                         .requestMatchers("/api/feature/generate").authenticated()
                         // Allow anyone to trigger the login page
-                        .anyRequest().permitAll()
-                )
+                        .anyRequest().permitAll())
                 .oauth2Login(oauth2 -> oauth2
-                        // 3. USE OUR CUSTOM HANDLER to save the user to the database and THEN bounce them!
-                        .successHandler(oAuth2LoginSuccessHandler)
-                )
+                        // 4. USE OUR CUSTOM HANDLER to save the user to the database and THEN bounce
+                        // them!
+                        .successHandler(oAuth2LoginSuccessHandler))
                 .logout(logout -> logout
                         .logoutUrl("/logout")
                         .logoutSuccessUrl("http://localhost:5173/")
-                        .invalidateHttpSession(true)
-                        .clearAuthentication(true)
-                        .deleteCookies("JSESSIONID")
-                        .permitAll()
-                );
+                        .permitAll())
+                // 5. Add JWT Filter before typical auth filter
+                .addFilterBefore(jwtAuthFilter,
+                        org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
@@ -51,16 +54,16 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
 
-        // Explicitly allow the React frontend
-        configuration.setAllowedOrigins(Arrays.asList("http://localhost:5173"));
+        // Allow React Web, Expo Web, and Mobile device connections (including nip.io
+        // variants for Google OAuth)
+        configuration.setAllowedOrigins(Arrays.asList(
+                "http://localhost:5173",
+                "http://192.168.29.245:8081",
+                "http://192.168.29.245.nip.io:8081",
+                "http://192.168.29.245:19000"));
 
-        // Allow all standard HTTP methods
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-
-        // Allow all headers
         configuration.setAllowedHeaders(Arrays.asList("*"));
-
-        // VERY IMPORTANT: Allow cookies/session IDs to be sent across ports
         configuration.setAllowCredentials(true);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();

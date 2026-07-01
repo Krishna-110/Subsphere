@@ -12,14 +12,21 @@ import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 
+import org.springframework.beans.factory.annotation.Value;
+
 @Component
 @RequiredArgsConstructor
 public class OAuth2LoginSuccessHandler extends SavedRequestAwareAuthenticationSuccessHandler {
 
     private final UserService userService;
+    private final JwtService jwtService;
+
+    @Value("${app.frontend.redirect-url}")
+    private String redirectUrl;
 
     @Override
-    public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws ServletException, IOException {
+    public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
+            Authentication authentication) throws ServletException, IOException {
 
         System.out.println("DEBUG: INSIDE SUCCESS HANDLER!");
 
@@ -33,7 +40,12 @@ public class OAuth2LoginSuccessHandler extends SavedRequestAwareAuthenticationSu
         // 1. Save or update user in database
         userService.processOAuthPostLogin(email, name, picture);
 
-        // 2. FORCED REDIRECT: Send them to the frontend dashboard
-        getRedirectStrategy().sendRedirect(request, response, "http://localhost:5173/dashboard");
+        // 2. Generate stateless JWT
+        String jwtToken = jwtService.generateToken(email);
+
+        // 3. DYNAMIC REDIRECT: Add JWT token to URL for React Native to parse
+        String finalUrl = redirectUrl.contains("?") ? redirectUrl + "&token=" + jwtToken : redirectUrl + "?token=" + jwtToken;
+        System.out.println("DEBUG: Redirecting to: " + finalUrl);
+        getRedirectStrategy().sendRedirect(request, response, finalUrl);
     }
 }

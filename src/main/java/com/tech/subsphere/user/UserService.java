@@ -54,6 +54,7 @@ public class UserService {
     /**
      * Core SaaS Logic: Can this user use the premium feature right now?
      */
+    @org.springframework.transaction.annotation.Transactional
     public boolean attemptToUseFeature(String email) {
         // 1. Find the user
         User user = userRepository.findByEmail(email)
