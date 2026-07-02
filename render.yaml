@@ -1,1 +1,24 @@
-c2VydmljZXM6CiAgLSB0eXBlOiB3ZWIKICAgIG5hbWU6IHN1YnNwaGVyZQogICAgZW52OiBkb2NrZXIKICAgIHJlcG86IGh0dHBzOi8vZ2l0aHViLmNvbS9LcmlzaG5hLTExMC9TdWJzcGhlcmUKICAgIGJyYW5jaDogbWFpbgogICAgcGxhbjogZnJlZQogICAgcmVnaW9uOiBzaW5nYXBvcmUKICAgIGRvY2tlcmZpbGVQYXRoOiAuL0RvY2tlcmZpbGUKICAgIGF1dG9EZXBsb3k6IHllcwogICAgZW52VmFyczoKICAgICAgLSBrZXk6IERBVEFCQVNFX1VSTAogICAgICAgIHZhbHVlOiAkU1VCU1BIRVJFX0RBVEFCQVNFX1VSTAogICAgICAtIGtleTogREFUQUJBU0VfVVNFUk5BTUUKICAgICAgICB2YWx1ZTogJFNVQlNQSEVSRV9EQVRBQkFTRV9VU0VSTkFNRQogICAgICAtIGtleTogREFUQUJBU0VfUEFTU1dPUkQKICAgICAgICB2YWx1ZTogJFNVQlNQSEVSRV9EQVRBQkFTRV9QQVNTV09SRAogICAgICAtIGtleTogU1BSSU5HX1BST0ZJTEVTX0FDVElWRQogICAgICAgIHZhbHVlOiBwcm9kCgogIC0gdHlwZTogcG9zdGdyZXNxbAogICAgbmFtZTogc3Vic3BoZXJlLWRiCiAgICBwbGFuOiBmcmVlCiAgICByZWdpb246IHNpbmdhcG9yZQo=
+services:
+  - type: web
+    name: subsphere
+    env: docker
+    repo: https://github.com/Krishna-110/Subsphere
+    branch: main
+    plan: free
+    region: singapore
+    dockerfilePath: ./Dockerfile
+    autoDeploy: yes
+    envVars:
+      - key: DATABASE_URL
+        value: $SUBSPHERE_DATABASE_URL
+      - key: DATABASE_USERNAME
+        value: $SUBSPHERE_DATABASE_USERNAME
+      - key: DATABASE_PASSWORD
+        value: $SUBSPHERE_DATABASE_PASSWORD
+      - key: SPRING_PROFILES_ACTIVE
+        value: prod
+
+  - type: postgresql
+    name: subsphere-db
+    plan: free
+    region: singapore
