@@ -1,64 +1,150 @@
-# 🚀 Subsphere - Modern SaaS Subscription & AI Platform
+# 🚀 Subsphere — SaaS Subscription & AI Platform
 
-Subsphere is a high-performance SaaS platform built for professional subscription management, AI integrations, and frictionless payments. Combining a robust **Spring Boot** backend with a dynamic **React/Vite** frontend, it’s designed for scale and developer experience.
+<p align="center">
+  <img src="https://img.shields.io/badge/Java-17%2B-orange?logo=java" alt="Java 17+"/>
+  <img src="https://img.shields.io/badge/Spring%20Boot-4.0.4-brightgreen?logo=spring" alt="Spring Boot 4.0.4"/>
+  <img src="https://img.shields.io/badge/React%20Native-Expo%20SDK%2054-blue?logo=react" alt="Expo SDK 54"/>
+  <img src="https://img.shields.io/badge/PostgreSQL-16-blue?logo=postgresql" alt="PostgreSQL 16"/>
+  <img src="https://img.shields.io/badge/Stripe-Integration-purple?logo=stripe" alt="Stripe Integration"/>
+  <img src="https://img.shields.io/badge/Deployed-Render-green?logo=render" alt="Deployed on Render"/>
+  <img src="https://img.shields.io/badge/license-MIT-lightgrey" alt="MIT License"/>
+</p>
+
+---
+
+**Subsphere** is a full-stack SaaS subscription management platform with AI-powered capabilities. It combines a robust **Spring Boot** backend with an **Expo React Native** mobile app, supporting subscription plans, secure authentication, Stripe payments, and Google Gemini AI features.
+
+## 🌐 Live Deployment
+
+| Layer | URL |
+|-------|-----|
+| **Backend API** | https://subsphere-jckj.onrender.com |
+| **Mobile App** | `subsphere-mobile/` (Expo — run locally) |
 
 ## ✨ Key Features
 
-- **🔐 Secure Authentication**: Integrated with Google OAuth2 for seamless, one-click user onboarding.
-- **💳 Payment Infrastructure**: Full-stack Stripe integration with support for subscriptions, checkouts, and webhooks.
-- **🤖 AI-Powered Capabilities**: Native integration with Google Gemini AI for advanced workflow automation (metadata analysis, user assistance, etc.).
-- **⚡ High-Performance Caching**: Redis-backed caching for ultra-fast session management and lower database latency.
-- **🎨 Premium UI**: A sleek, responsive dashboard built with React, Tailwind CSS, and Vite for a modern editorial aesthetic.
+| Feature | Description |
+|---------|-------------|
+| 🔐 **Secure Auth** | JWT-based + Google OAuth2 login |
+| 💳 **Stripe Payments** | Subscriptions, checkout, webhooks |
+| 🤖 **Gemini AI** | Interview prep, feature suggestions |
+| 📄 **PDF Extraction** | Parse & analyze PDFs with AI |
+| 📱 **Mobile App** | Expo React Native + NativeWind UI |
+| 🗄️ **PostgreSQL** | Production DB via JPA/Hibernate |
+| 📊 **Subscription Plans** | FREE & PRO tiers |
+| 🖥️ **REST API** | Spring Security-protected endpoints |
 
 ## 🛠 Tech Stack
 
-### Backend
-- **Core**: Java 17+, Spring Boot
-- **Database**: MySQL (Hibernate/JPA)
-- **Security**: Spring Security, OAuth2
-- **Infrastructure**: Redis (Cache), Stripe (Payments)
-- **AI**: Google Gemini API
+### Backend (`src/`)
+| Technology | Version |
+|------------|--------|
+| **Java** | 17+ |
+| **Spring Boot** | 4.0.4 |
+| **Spring Security** | JWT + OAuth2 |
+| **Spring Data JPA** | Hibernate ORM |
+| **PostgreSQL** | Primary DB |
+| **Stripe API** | Payments |
+| **Google Gemini API** | AI features |
+| **Maven** | Build tool |
+| **Docker** | Containerization |
 
-### Frontend
-- **Framework**: React.js (Vite)
-- **Styling**: Tailwind CSS
-- **Interactions**: Framer Motion for premium animations
+### Mobile App (`subsphere-mobile/`)
+| Technology | Version |
+|------------|--------|
+| **React Native** | 0.81.5 |
+| **Expo** | SDK 54 |
+| **Expo Router** | 6.0 |
+| **NativeWind** | Tailwind CSS |
+| **TypeScript** | Type-safe |
 
----
+## 📁 Project Structure
+
+```
+Subsphere/
+├── pom.xml                    # Maven build config
+├── Dockerfile                 # Container setup
+├── render.yaml                # Render deployment config
+├── src/                       # Spring Boot backend
+│   └── main/
+│       ├── java/com/tech/subsphere/
+│       │   ├── config/        # Security, OAuth2, Stripe
+│       │   ├── controller/    # REST endpoints
+│       │   ├── model/         # JPA entities
+│       │   ├── repository/    # Data access
+│       │   ├── service/       # Gemini, PDF, Stripe
+│       │   └── subscription/  # Plan management
+│       └── resources/
+│           └── application.properties
+├── subsphere-mobile/          # Expo React Native app
+│   ├── app/                   # Screens (Expo Router)
+│   ├── components/            # Reusable UI
+│   ├── hooks/                 # Custom hooks
+│   └── constants/             # Theme, config
+└── .env.template              # Env template
+```
 
 ## 🚀 Quick Start (Local)
 
-### 1. Prerequisites
-- Java 17+
-- Node.js & npm/yarn/pnpm
-- MySQL & Redis
+### Prerequisites
+- Java 17+, Node.js 18+, PostgreSQL, Stripe test keys, Gemini API key
 
-### 2. Environment Setup
-Create a `.env` file (refer to [`.env.template`](.env.template)) and fill in your credentials.
-
-### 3. Backend Execution
+### Backend
 ```bash
-./mvnw clean package
+git clone https://github.com/Krishna-110/Subsphere.git
+cd Subsphere
+./mvnw clean package -DskipTests
+export DATABASE_URL=jdbc:postgresql://localhost:5432/subsphere
+export DATABASE_USERNAME=your_user
+export DATABASE_PASSWORD=your_pass
+export JWT_SECRET=your_jwt_secret
+export JWT_EXPIRATION=86400000
+export STRIPE_SECRET_KEY=sk_test_...
+export STRIPE_WEBHOOK_SECRET=whsec_...
+export GEMINI_API_KEY=your_key
+export APP_REDIRECT_URL=http://localhost:8080/dashboard
 java -jar target/subsphere-0.0.1-SNAPSHOT.jar
 ```
 
-### 4. Frontend Execution
+API starts at **http://localhost:8080**.
+
+### Mobile App
 ```bash
-cd subsphere-ui
+cd subsphere-mobile
 npm install
-npm run dev
+npx expo start
 ```
 
----
+## 🌩️ Deployment
 
-## ☁️ Deployment Architecture
+Deployed on **Render** (free tier, Singapore) via `render.yaml`:
+- Web Service: auto-deploys from `main` branch
+- PostgreSQL: managed database
 
-This project is optimized for deployment on **AWS** using:
-- **AWS Amplify** for frontend hosting.
-- **AWS Elastic Beanstalk** for backend compute.
-- **AWS RDS (MySQL)** for persistent data storage.
+## 📬 API Endpoints
 
----
+| Method | Path | Auth | Description |
+|--------|------|------|-------------|
+| POST | /api/auth/signup | No | Register |
+| POST | /api/auth/login | No | Login (returns JWT) |
+| POST | /api/auth/oauth2/google | No | Google OAuth2 |
+| GET | /api/user/profile | JWT | Get profile |
+| PUT | /api/user/profile | JWT | Update profile |
+| GET | /api/plans | JWT | List plans |
+| POST | /api/payment/create-checkout-session | JWT | Stripe checkout |
+| POST | /api/payment/webhook | Stripe | Webhook handler |
+| POST | /api/gemini/interview | JWT | AI interview prep |
+| POST | /api/gemini/feature | JWT | AI suggestions |
+| POST | /api/gemini/pdf | JWT | PDF + AI analysis |
 
 ## 📜 License
+
 This project is for demonstration and production use. All rights reserved.
+
+## 👨‍💻 Author
+
+**Krishna Raj** — [GitHub](https://github.com/Krishna-110)
+
+---
+
+*Built with Spring Boot 4, Expo React Native, PostgreSQL, and Google Gemini AI. Deployed on Render.*
