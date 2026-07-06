@@ -7,6 +7,7 @@ import Animated, { useSharedValue, useAnimatedStyle, withRepeat, withTiming, Eas
 
 import * as WebBrowser from 'expo-web-browser';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import * as Linking from 'expo-linking';
 
 import { Image } from 'expo-image';
 
@@ -35,9 +36,31 @@ const Landing = () => {
 
   const handleLogin = async () => {
     try {
-      await WebBrowser.openBrowserAsync(AUTH_URL);
+      console.log("DEBUG: [handleLogin] Starting auth session with URL:", AUTH_URL);
+      // Generate redirect link
+      const redirectUrl = Linking.createURL('dashboard');
+      console.log("DEBUG: [handleLogin] Expected Redirect URL:", redirectUrl);
+      
+      const result = await WebBrowser.openAuthSessionAsync(AUTH_URL, redirectUrl);
+      console.log("DEBUG: [handleLogin] Auth session finished:", result);
+      
+      if (result.type === 'success' && result.url) {
+        const parsed = Linking.parse(result.url);
+        console.log("DEBUG: [handleLogin] Parsed deep link result:", parsed);
+        const token = parsed.queryParams?.token as string;
+        
+        if (token) {
+          console.log("DEBUG: [handleLogin] Extracted JWT token, saving to AsyncStorage.");
+          await AsyncStorage.setItem('userToken', token);
+          router.replace('/dashboard');
+        } else {
+          console.log("DEBUG: [handleLogin] Token not found in redirect URL query params.");
+        }
+      } else {
+        console.log("DEBUG: [handleLogin] Auth session cancelled or closed.");
+      }
     } catch (error) {
-      console.log("Auth Error:", error);
+      console.log("DEBUG: [handleLogin] Auth session failed:", error);
     }
   };
 
