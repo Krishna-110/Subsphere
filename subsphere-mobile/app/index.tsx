@@ -12,8 +12,10 @@ import { Image } from 'expo-image';
 
 const { width } = Dimensions.get('window');
 
-// Replace YOUR_CURRENT_IP with your computer's actual Wi-Fi IP address (like 192.168.1.x)
-const AUTH_URL = "http://192.168.29.245.nip.io:8080/oauth2/authorization/google";
+// Dynamically select URL based on development or production mode
+const AUTH_URL = __DEV__
+  ? "http://192.168.29.245.nip.io:8080/oauth2/authorization/google"
+  : "https://subsphere-jckj.onrender.com/oauth2/authorization/google";
 
 const GOOGLE_LOGO_URL = "https://www.google.com/images/branding/googleg/1x/googleg_standard_color_128dp.png";
 

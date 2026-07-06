@@ -18,8 +18,10 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const { width } = Dimensions.get('window');
 
-// Global API Configuration
-const API_BASE_URL = "http://192.168.29.245.nip.io:8080";
+// Dynamically select API base URL based on development or production mode
+const API_BASE_URL = __DEV__
+  ? "http://192.168.29.245.nip.io:8080"
+  : "https://subsphere-jckj.onrender.com";
 
 const Dashboard = () => {
     const router = useRouter();
