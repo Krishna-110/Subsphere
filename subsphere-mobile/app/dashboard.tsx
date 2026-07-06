@@ -42,6 +42,7 @@ const Dashboard = () => {
     useEffect(() => {
         const initializeAuth = async () => {
             let token = params.token as string;
+            console.log("DEBUG: [initializeAuth] Token from params:", token);
 
             if (token) {
                 // If we got a new token from deep link, save it!
@@ -49,15 +50,18 @@ const Dashboard = () => {
             } else {
                 // Otherwise, try to recover the old one
                 const savedToken = await AsyncStorage.getItem('userToken');
+                console.log("DEBUG: [initializeAuth] Recovered token from storage:", savedToken);
                 if (savedToken) token = savedToken;
             }
 
             if (token) {
                 // Set the default Authorization header for all future axios requests
                 axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+                console.log("DEBUG: [initializeAuth] Token established, calling fetchProfile()...");
                 fetchProfile();
             } else {
                 // No token anywhere? Back to base.
+                console.log("DEBUG: [initializeAuth] No token found anywhere, redirecting to login page (index)");
                 router.replace("/");
             }
         };
@@ -67,10 +71,16 @@ const Dashboard = () => {
 
     const fetchProfile = async () => {
         try {
+            console.log("DEBUG: [fetchProfile] Fetching profile from:", `${API_BASE_URL}/api/users/me`);
             const response = await axios.get(`${API_BASE_URL}/api/users/me`);
+            console.log("DEBUG: [fetchProfile] Profile fetch success:", response.data);
             setUser(response.data);
         } catch (error) {
-            console.log("Authentication failed. Terminating session...");
+            console.log("DEBUG: [fetchProfile] Authentication failed. Error details:", error);
+            if (axios.isAxiosError(error)) {
+                console.log("DEBUG: [fetchProfile] Axios error status:", error.response?.status);
+                console.log("DEBUG: [fetchProfile] Axios error data:", error.response?.data);
+            }
             handleLogout();
         }
     };

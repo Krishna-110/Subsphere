@@ -62,9 +62,9 @@ public class SecurityConfig {
         // Allow React Web, Expo Web, and Mobile device connections (including nip.io
         // variants for Google OAuth)
         if (allowedOrigins != null && !allowedOrigins.trim().isEmpty()) {
-            configuration.setAllowedOrigins(Arrays.asList(allowedOrigins.split(",")));
+            configuration.setAllowedOriginPatterns(Arrays.asList(allowedOrigins.split(",")));
         } else {
-            configuration.setAllowedOrigins(Arrays.asList("*"));
+            configuration.setAllowedOriginPatterns(Arrays.asList("*"));
         }
 
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
