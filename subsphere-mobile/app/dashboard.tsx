@@ -117,31 +117,49 @@ const Dashboard = () => {
 
     const pickDocument = async () => {
         try {
+            console.log("DEBUG: [pickDocument] Opening DocumentPicker...");
             const res = await DocumentPicker.getDocumentAsync({
                 type: 'application/pdf',
                 copyToCacheDirectory: true,
             });
 
-            if (res.canceled) return;
+            if (res.canceled) {
+                console.log("DEBUG: [pickDocument] Document picking cancelled.");
+                return;
+            }
 
             setExtracting(true);
             const formData = new FormData();
 
-            // Handle Expo's result format
             const file = res.assets[0];
+            console.log("DEBUG: [pickDocument] File picked successfully:", file.name, "URI:", file.uri);
+
+            // Append file with default name fallback if not present
             formData.append('file', {
                 uri: file.uri,
                 type: 'application/pdf',
-                name: file.name,
+                name: file.name || 'resume.pdf',
             } as any);
 
+            console.log("DEBUG: [pickDocument] Sending POST request to:", `${API_BASE_URL}/api/feature/extract-pdf`);
+
+            // Note: Omit 'Content-Type': 'multipart/form-data' to let Axios automatically 
+            // generate the header with the correct boundary parameter!
             const response = await axios.post(`${API_BASE_URL}/api/feature/extract-pdf`, formData, {
-                headers: { 'Content-Type': 'multipart/form-data' }
+                headers: { 
+                    'Accept': 'application/json'
+                }
             });
 
+            console.log("DEBUG: [pickDocument] PDF parsing success. Extracted text size:", response.data?.length);
             setResume(response.data);
             Alert.alert("Success", "Resume blueprint decrypted successfully.");
         } catch (err) {
+            console.log("DEBUG: [pickDocument] PDF extraction failed with error:", err);
+            if (axios.isAxiosError(err)) {
+                console.log("DEBUG: [pickDocument] Axios response status:", err.response?.status);
+                console.log("DEBUG: [pickDocument] Axios response data:", err.response?.data);
+            }
             Alert.alert("Error", "FAILED to extract PDF data. Is the backend server running?");
         } finally {
             setExtracting(false);
