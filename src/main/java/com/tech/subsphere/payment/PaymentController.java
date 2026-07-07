@@ -9,6 +9,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.http.ResponseEntity;
+import org.springframework.beans.factory.annotation.Value;
+import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
 import java.util.Map;
@@ -20,6 +22,23 @@ public class PaymentController {
 
     private final StripeService stripeService;
     private final PlanRepository planRepository; // We need this to find the PRO plan's Stripe ID
+
+    @Value("${app.frontend.redirect-url}")
+    private String redirectUrl;
+
+    @GetMapping("/success")
+    public void paymentSuccess(HttpServletResponse response) throws IOException {
+        System.out.println("DEBUG: Payment success callback, redirecting to app: " + redirectUrl);
+        String finalUrl = redirectUrl.contains("?") ? redirectUrl + "&payment=success" : redirectUrl + "?payment=success";
+        response.sendRedirect(finalUrl);
+    }
+
+    @GetMapping("/cancel")
+    public void paymentCancel(HttpServletResponse response) throws IOException {
+        System.out.println("DEBUG: Payment cancel callback, redirecting to app: " + redirectUrl);
+        String finalUrl = redirectUrl.contains("?") ? redirectUrl + "&payment=cancelled" : redirectUrl + "?payment=cancelled";
+        response.sendRedirect(finalUrl);
+    }
 
     @GetMapping("/checkout")
     public ResponseEntity<Map<String, String>> createCheckout(@AuthenticationPrincipal Object principal) {
